@@ -43,7 +43,6 @@
 #
 import sys
 import signal
-import struct
 import _ptrace
 import argparse
 
@@ -61,7 +60,6 @@ def attached_handler(process):
     process.breakpoint_set(bp_free)
 
 def alloc(breakpoint, thread):
-    regs = thread.registers
     retaddr = _ptrace.cconv.retaddr_get(thread)
 
     (heap, flags, size) = _ptrace.cconv.args_get(thread, "%p%lu%zu")

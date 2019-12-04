@@ -69,7 +69,6 @@ def get_message(thread, lpmsg):
     (hwnd, message, wparam, lparam) = thread.sscanf(lpmsg, "%p%p%p%p")
 
     mtype = message & 0xFFFF
-    pid = thread.process.id
     if mtype in (WM_CHAR, WM_DEADCHAR, WM_SYSCHAR, WM_SYSDEADCHAR, WM_IME_CHAR):
         c = struct.pack('=H', wparam).decode('utf-16')
     elif mtype == WM_UNICHAR and wparam != UNICODE_NOCHAR:

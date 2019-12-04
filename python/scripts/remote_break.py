@@ -42,7 +42,6 @@
 #
 import sys
 import time
-import struct
 import _ptrace
 import argparse
 import threading

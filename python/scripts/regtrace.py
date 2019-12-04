@@ -40,7 +40,6 @@
 #
 import sys
 import signal
-import struct
 import _ptrace
 import argparse
 

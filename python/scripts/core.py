@@ -41,8 +41,6 @@
 # Author: Ronald Huizer <ronald@immunityinc.com>
 #
 import sys
-import time
-import struct
 import _ptrace
 import argparse
 import threading

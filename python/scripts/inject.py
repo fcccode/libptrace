@@ -39,8 +39,6 @@
 # Author: Ronald Huizer <ronald@immunityinc.com>
 #
 import sys
-import signal
-import struct
 import _ptrace
 import argparse
 
