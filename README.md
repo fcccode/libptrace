@@ -78,6 +78,18 @@ make
 makensis -DUSE64 libptrace-setup.nsi
 ```
 
+For Python 3.7 support, only the makensis invocation should be changed:
+
+A 32-bit Python 3.7 installer can be built using:
+```
+makensis -DPYTHON37 libptrace-setup.nsi
+```
+
+A 64-bit Python 3.7 installer can be built using:
+```
+makensis -DPYTHON37 -DUSE64 libptrace-setup.nsi
+```
+
 ## Installation
 
 **WARNING** when using the installer please do not change the
