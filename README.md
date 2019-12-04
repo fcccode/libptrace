@@ -27,7 +27,7 @@ grateful to have been able to actively develop on it during my working hours
 and see the framework become more mature.  I redesigned most of it to be aware
 of multiple cores, to provide Python bindings, and create better abstractions.
 
-With the eventual release of x86dbg it was decided we would no longer work on
+With the eventual release of x64dbg it was decided we would no longer work on
 Immunity Debugger, and instead focus our efforts on other things.  This also
 stalled libptrace development, and for the following years it collected dust in
 the internal git repository, until after the acquisition of Immunity Inc. by
@@ -152,7 +152,7 @@ def bp_handler(bp, thread):
 
     retaddr = _ptrace.cconv.retaddr_get(thread)
     if thread.process.breakpoint_find(retaddr) is None:
-        bp_end  = _ptrace.breakpoint_sw(retaddr, bp_end_handler)
+        bp_end = _ptrace.breakpoint_sw(retaddr, bp_end_handler)
         thread.process.breakpoint_set(bp_end)
 ```
 
