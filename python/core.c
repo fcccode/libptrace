@@ -45,6 +45,7 @@
 #include <python/structmember.h>
 #include <libptrace/error.h>
 #include <libptrace/factory.h>
+#include "compat.h"
 #include "core.h"
 #include "ptrace.h"
 #include "thread.h"
@@ -76,7 +77,7 @@ pypt_core_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 		return NULL;
 
 	if ( (self->dict = PyDict_New()) == NULL) {
-		self->ob_type->tp_free((PyObject*)self);
+		Py_TYPE(self)->tp_free((PyObject*)self);
 		return NULL;
 	}
 
@@ -89,7 +90,7 @@ static void
 pypt_core_dealloc(struct pypt_core *self)
 {
 	Py_XDECREF(self->dict);
-	self->ob_type->tp_free((PyObject *)self);
+	Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
 static PyObject *
@@ -388,9 +389,9 @@ PyObject *pypt_core_execv(struct pypt_core *self, PyObject *args)
 	PyObject *process_args;
 	PyObject *pyhandlers;
 	Py_ssize_t count, i;
+	const char **argv;
 	PyObject *pyargv;
 	char *pathname;
-	char **argv;
 	int options;
 
 	if (!PyArg_ParseTuple(args, "sOOi", &pathname, &pyargv, &pyhandlers, &options))
@@ -470,7 +471,7 @@ PyObject *pypt_core_execv(struct pypt_core *self, PyObject *args)
 	}
 
         Py_BEGIN_ALLOW_THREADS
-	process = self->core->c_op->execv(self->core, pathname, argv, &handlers, options);
+	process = self->core->c_op->execv(self->core, pathname, (char * const *)argv, &handlers, options);
 	Py_END_ALLOW_THREADS
 	free(argv);
 
@@ -507,7 +508,7 @@ PyObject *pypt_core_quit(struct pypt_core *self, PyObject *args)
 
 static PyObject *pypt_core__repr__(struct pypt_core *self)
 {
-	return PyString_FromFormat("<%s(%p)>", self->ob_type->tp_name, self);
+	return PyString_FromFormat("<%s(%p)>", Py_TYPE(self)->tp_name, self);
 }
 
 static PyGetSetDef pypt_core_getset[] = {
@@ -537,8 +538,7 @@ static PyMemberDef pypt_core_members[] = {
 };
 
 PyTypeObject pypt_core_type = {
-	PyObject_HEAD_INIT(NULL)
-	0,					/* ob_size */
+	PyVarObject_HEAD_INIT(NULL, 0)
 	"_ptrace.core",				/* tp_name */
 	sizeof(struct pypt_core),		/* tp_basicsize */
 	0,					/* tp_itemsize */

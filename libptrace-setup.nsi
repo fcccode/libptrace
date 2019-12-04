@@ -107,10 +107,24 @@ function .onInit
         SetRegView 64
     !endif
 
-    ReadRegStr $0 HKLM Software\Python\PythonCore\2.7\InstallPath ""
+!ifdef PYTHON37
+    ReadRegStr $0 HKCU Software\Python\PythonCore\3.7\InstallPath ""
+    ${If} $0 == ""
+        ReadRegStr $0 HKLM Software\Python\PythonCore\3.7\InstallPath ""
+    ${EndIf}
+!else
+    ReadRegStr $0 HKCU Software\Python\PythonCore\2.7\InstallPath ""
+    ${If} $0 == ""
+        ReadRegStr $0 HKLM Software\Python\PythonCore\2.7\InstallPath ""
+    ${EndIf}
+!endif
 
     ${If} $0 == ""
+!ifdef PYTHON37
+        MessageBox MB_OK|MB_ICONSTOP "Python 3.7 was not found on the system: $0"
+!else
         MessageBox MB_OK|MB_ICONSTOP "Python 2.7 was not found on the system: $0"
+!endif
         Quit
     ${EndIf}
 
@@ -124,7 +138,11 @@ Section "libptrace" SecPtrace
 
     CreateDirectory $PythonPackages
     SetOutPath $PythonPackages
-    File "/oname=_ptrace.pyd" "python/libpyptrace.dll"
+!ifdef PYTHON37
+    File "/oname=_ptrace.pyd" "python/libpy37ptrace.dll"
+!else
+    File "/oname=_ptrace.pyd" "python/libpy27ptrace.dll"
+!endif
     !insertmacro InstallLib DLL NOTSHARED REBOOT_NOTPROTECTED src/libptrace.dll $SYSDIR\libptrace.dll $SYSDIR
 
     SetOutPath $INSTDIR
@@ -153,10 +171,18 @@ function un.onInit
         SetRegView 64
     !endif
 
+!ifdef PYTHON37
+    ReadRegStr $0 HKLM Software\Python\PythonCore\3.7\InstallPath ""
+!else
     ReadRegStr $0 HKLM Software\Python\PythonCore\2.7\InstallPath ""
+!endif
 
     ${If} $0 == ""
+!ifdef PYTHON37
+        MessageBox MB_OK|MB_ICONSTOP "Python 3.7 was not found on the system: $0"
+!else
         MessageBox MB_OK|MB_ICONSTOP "Python 2.7 was not found on the system: $0"
+!endif
         Quit
     ${EndIf}
 

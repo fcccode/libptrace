@@ -46,6 +46,7 @@
 #include <libptrace/error.h>
 #include <libptrace/factory.h>
 #include <libptrace/util.h>
+#include "compat.h"
 #include "core.h"
 #include "event.h"
 #include "breakpoint.h"
@@ -57,6 +58,9 @@
 #include "thread.h"
 #include "inject.h"
 #include "../src/core.h"
+
+#define MODULE      _ptrace
+#define MODULE_NAME "_ptrace"
 
 PyObject *pypt_exception;
 struct pypt_core *__pypt_core_main;
@@ -92,6 +96,20 @@ static PyMethodDef pypt_ptrace_module_methods[] = {
 	{ NULL }
 };
 
+#if PY_MAJOR_VERSION >= 3
+static struct PyModuleDef pypt_module_def = {
+	PyModuleDef_HEAD_INIT,
+	MODULE_NAME,			/* m_name */
+	NULL,				/* m_doc */
+	-1,				/* m_size */
+	pypt_ptrace_module_methods,	/* m_methods */
+	NULL,				/* m_reload */
+	NULL,				/* m_traverse */
+	NULL,				/* m_clear */
+	NULL,				/* m_free */
+};
+#endif
+
 static void __add_constants(PyObject *m)
 {
 	PyObject *i;
@@ -106,50 +124,54 @@ static void __add_constants(PyObject *m)
 		PyModule_AddObject(m, "CORE_WINDOWS", i);
 }
 
-PyMODINIT_FUNC init_ptrace(void)
+PyMODINIT_FUNC MODULE_INIT_FUNC_NAME(MODULE)(void)
 {
 	PyObject *m;
 
 	pypt_breakpoint_type.tp_new = PyType_GenericNew;
 
-	pypt_exception = PyErr_NewException("_ptrace.error", NULL, NULL);
+	pypt_exception = PyErr_NewException(MODULE_NAME ".error", NULL, NULL);
 	if (pypt_exception == NULL)
-		return;
+		MODULE_INIT_FUNC_RETURN(NULL);
 
 	if (PyType_Ready(&pypt_breakpoint_type) < 0)
-		return;
+		MODULE_INIT_FUNC_RETURN(NULL);
 
 	if (PyType_Ready(&pypt_breakpoint_sw_type) < 0)
-		return;
+		MODULE_INIT_FUNC_RETURN(NULL);
 
 	if (PyType_Ready(&pypt_core_type) < 0)
-		return;
+		MODULE_INIT_FUNC_RETURN(NULL);
 
 	if (PyType_Ready(&pypt_log_hook_type) < 0)
-		return;
+		MODULE_INIT_FUNC_RETURN(NULL);
 
 	if (PyType_Ready(&pypt_module_type) < 0)
-		return;
+		MODULE_INIT_FUNC_RETURN(NULL);
 
 	if (PyType_Ready(&pypt_process_type) < 0)
-		return;
+		MODULE_INIT_FUNC_RETURN(NULL);
 
 	if (PyType_Ready(&pypt_thread_type) < 0)
-		return;
+		MODULE_INIT_FUNC_RETURN(NULL);
 
 	if (PyType_Ready(&pypt_cconv_type) < 0)
-		return;
+		MODULE_INIT_FUNC_RETURN(NULL);
 
 	if (PyType_Ready(&pypt_mmap_type) < 0)
-		return;
+		MODULE_INIT_FUNC_RETURN(NULL);
 
 	if (PyType_Ready(&pypt_event_handlers_type) < 0)
-		return;
+		MODULE_INIT_FUNC_RETURN(NULL);
 
 	if (PyType_Ready(&pypt_inject_type) < 0)
-		return;
+		MODULE_INIT_FUNC_RETURN(NULL);
 
-	m = Py_InitModule("_ptrace", pypt_ptrace_module_methods);
+#if PY_MAJOR_VERSION >= 3
+	m = PyModule_Create(&pypt_module_def);
+#else
+	m = Py_InitModule(MODULE_NAME, pypt_ptrace_module_methods);
+#endif
 
 	__add_constants(m);
 
@@ -177,11 +199,12 @@ PyMODINIT_FUNC init_ptrace(void)
 	PyModule_AddObject(m, "inject", (PyObject *)&pypt_inject_type);
 
 	__pypt_core_main = (struct pypt_core *)
-                PyObject_CallMethod((PyObject *)&pypt_core_type, "__new__", "O", pypt_core_type);
+                PyObject_CallMethod((PyObject *)&pypt_core_type, "__new__", "O", &pypt_core_type);
 	if (__pypt_core_main == NULL)
-		return;
+		MODULE_INIT_FUNC_RETURN(NULL);
 
 	__pypt_core_main->core = &__pt_core_main;
+	MODULE_INIT_FUNC_RETURN(m);
 }
 
 static PyObject *pypt_log_hook_add(PyObject *self, PyObject *args)
