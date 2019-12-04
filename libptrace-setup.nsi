@@ -172,9 +172,15 @@ function un.onInit
     !endif
 
 !ifdef PYTHON37
-    ReadRegStr $0 HKLM Software\Python\PythonCore\3.7\InstallPath ""
+    ReadRegStr $0 HKCU Software\Python\PythonCore\3.7\InstallPath ""
+    ${If} $0 == ""
+        ReadRegStr $0 HKLM Software\Python\PythonCore\3.7\InstallPath ""
+    ${EndIf}
 !else
-    ReadRegStr $0 HKLM Software\Python\PythonCore\2.7\InstallPath ""
+    ReadRegStr $0 HKCU Software\Python\PythonCore\2.7\InstallPath ""
+    ${If} $0 == ""
+        ReadRegStr $0 HKLM Software\Python\PythonCore\2.7\InstallPath ""
+    ${EndIf}
 !endif
 
     ${If} $0 == ""
