@@ -70,7 +70,8 @@ int                    pt_iterator_module_end(struct pt_iterator *);
 void                   pt_iterator_module_next(struct pt_iterator *);
 struct pt_module *     pt_iterator_module_get(struct pt_iterator *);
 
-struct pt_iterator     pt_iterator_breakpoint_begin(struct pt_process *);
+struct pt_iterator     pt_iterator_breakpoint_begin_process(struct pt_process *);
+struct pt_iterator     pt_iterator_breakpoint_begin_thread(struct pt_thread *);
 int                    pt_iterator_breakpoint_end(struct pt_iterator *);
 void                   pt_iterator_breakpoint_next(struct pt_iterator *);
 struct pt_breakpoint * pt_iterator_breakpoint_get(struct pt_iterator *);

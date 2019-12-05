@@ -42,13 +42,14 @@
  * Author: Ronald Huizer <rhuizer@hexpedition.com>, <ronald@immunityinc.com>
  *
  */
-#ifndef __LIBPTRACE_THREAD_H
-#define __LIBPTRACE_THREAD_H
+#ifndef __PT_THREAD_INTERNAL_H
+#define __PT_THREAD_INTERNAL_H
 
 #include <libptrace/breakpoint.h>
 #include <libptrace/breakpoint_x86.h>
 //#include <libptrace/error.h>
 #include <libptrace/types.h>
+#include "avl.h"
 
 /* Thread states */
 #define THREAD_EXITED				2
@@ -71,14 +72,6 @@
 	     *an2 = avl_tree_next_safe(an);				\
 	     m = container_of(an, struct pt_breakpoint_internal,	\
 	                      avl_node),				\
-	     an != NULL;						\
-	     an = an2, an2 = avl_tree_next_safe(an))
-
-#define pt_thread_for_each_breakpoint(p, m)				\
-	for (struct avl_node *an = avl_tree_min(&(p)->breakpoints),	\
-	     *an2 = avl_tree_next_safe(an);				\
-	     m = container_of(an, struct pt_breakpoint_internal,	\
-	                      avl_node)->breakpoint,			\
 	     an != NULL;						\
 	     an = an2, an2 = avl_tree_next_safe(an))
 
@@ -175,4 +168,4 @@ pt_address_t pt_thread_register_pc_get(struct pt_thread *);
 };
 #endif /* __cplusplus */
 
-#endif /* !__LIBPTRACE_THREAD_H */
+#endif /* !__PT_THREAD_INTERNAL_H */
