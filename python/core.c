@@ -109,15 +109,13 @@ pypt_core_options_set(struct pypt_core *self, PyObject *value, void *closure)
 		return -1;
 	}
 
-	if (PyInt_Check(value)) {
-                options = PyInt_AsLong(value);
-	} else if (PyLong_Check(value)) {
-		options = PyLong_AsLong(value);
-	} else {
-		PyErr_SetString(PyExc_TypeError, "'value' must be an integer type.");
+	if (!py_num_check(value)) {
+		PyErr_SetString(PyExc_TypeError,
+		                "'value' must be an integer type.");
 		return -1;
 	}
 
+	options = py_num_to_long(value);
 	if (options == -1 && PyErr_Occurred())
 		return -1;
 
@@ -389,9 +387,9 @@ PyObject *pypt_core_execv(struct pypt_core *self, PyObject *args)
 	PyObject *process_args;
 	PyObject *pyhandlers;
 	Py_ssize_t count, i;
-	const char **argv;
 	PyObject *pyargv;
 	char *pathname;
+	char **argv;
 	int options;
 
 	if (!PyArg_ParseTuple(args, "sOOi", &pathname, &pyargv, &pyhandlers, &options))
@@ -424,12 +422,12 @@ PyObject *pypt_core_execv(struct pypt_core *self, PyObject *args)
 		if ( (item = PyList_GetItem(pyargv, i)) == NULL)
 			goto err_argv;
 
-		if (!PyString_Check(item)) {
+		if (!py_string_check(item)) {
 			PyErr_SetString(PyExc_TypeError, "Expected a string.");
 			goto err_argv;
 		}
 
-		if ( (argv[i] = PyString_AsString(item)) == NULL)
+		if ( (argv[i] = py_string_to_utf8(item)) == NULL)
 			goto err_argv;
 	}
 	argv[i] = NULL;
@@ -473,6 +471,9 @@ PyObject *pypt_core_execv(struct pypt_core *self, PyObject *args)
         Py_BEGIN_ALLOW_THREADS
 	process = self->core->c_op->execv(self->core, pathname, (char * const *)argv, &handlers, options);
 	Py_END_ALLOW_THREADS
+
+	while (i-- > 0)
+		free(argv[i]);
 	free(argv);
 
 	if (process == NULL) {
@@ -481,11 +482,14 @@ PyObject *pypt_core_execv(struct pypt_core *self, PyObject *args)
 	}
 
 	pyprocess->process = process;
-	process->__super = pyprocess;
+	process->__super   = pyprocess;
 
 	return __process_to_handle(process);
 
 err_argv:
+	while (i-- > 0)
+		free(argv[i]);
+
 	free(argv);
 err:
 	return NULL;

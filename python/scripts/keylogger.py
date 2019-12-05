@@ -38,6 +38,7 @@
 #
 # Author: Ronald Huizer <ronald@immunityinc.com>
 #
+from __future__ import print_function
 import sys
 import signal
 import struct
@@ -104,7 +105,7 @@ def peek_message_ret_hook(breakpoint, thread):
     get_message(thread, thread.lpmsg)
 
 def attached_handler(process):
-    print "Attached to process %d." % process.id
+    print("Attached to process {}.".format(process.id))
 
     # Hook DispatchMessageW(...)
     bp = _ptrace.breakpoint_sw("user32!DispatchMessageW", dispatch_message_hook)

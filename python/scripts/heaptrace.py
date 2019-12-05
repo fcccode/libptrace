@@ -41,6 +41,7 @@
 #
 # Author: Ronald Huizer <ronald@immunityinc.com>
 #
+from __future__ import print_function
 import sys
 import signal
 import _ptrace
@@ -50,7 +51,7 @@ def break_handler(signum, frame):
     _ptrace.quit();
 
 def logger(cookie, string):
-    print string,
+    print(string, end='')
 
 def attached_handler(process):
     bp_alloc = _ptrace.breakpoint_sw("ntdll!RtlAllocateHeap", alloc)
@@ -63,19 +64,20 @@ def alloc(breakpoint, thread):
     retaddr = _ptrace.cconv.retaddr_get(thread)
 
     (heap, flags, size) = _ptrace.cconv.args_get(thread, "%p%lu%zu")
-    print "T%d: RtlAllocateHeap(0x%x, 0x%x, 0x%x)" % (thread.id, heap, flags, size),
+    print("T{}: RtlAllocateHeap(0x{:x}, 0x{:x}, 0x{:x})"
+          .format(thread.id, heap, flags, size), end='')
 
     # Set breakpoint after function returns, so we can print the results.
-    if thread.proces.breakpoint_find(retaddr) is None:
+    if thread.process.breakpoint_find(retaddr) is None:
         bp_end = _ptrace.breakpoint_sw(retaddr, alloc_end)
         thread.process.breakpoint_set(bp_end)
 
 def alloc_end(breakpoint, thread):
-    print "= 0x%.8x" % _ptrace.cconv.retval_get(thread)
+    print("= 0x{:08x}".format(_ptrace.cconv.retval_get(thread)))
 
 def free(breakpoint, thread):
     (heap, flags, size) = _ptrace.cconv.args_get(thread, "%p%lu%zu")
-    print "T%d: RtlFreeHeap(0x%x, 0x%x, 0x%x)" % (thread.id, heap, flags, size)
+    print("T{}: RtlFreeHeap(0x{:x}, 0x{:x}, 0x{:x})".format(thread.id, heap, flags, size))
 
 parser = argparse.ArgumentParser(description='Heap activity tracer.')
 parser.add_argument('file', nargs='?', metavar='filename', help='executable to trace.')

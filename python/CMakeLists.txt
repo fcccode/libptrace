@@ -51,8 +51,8 @@ else()
 	message(FATAL_ERROR, "Unsupported processor.")
 endif()
 
-set(SOURCES breakpoint.c breakpoint.h breakpoint_sw.c core.c core.h
-            utils.c utils.h
+set(SOURCES breakpoint.c breakpoint.h breakpoint_sw.c compat.c compat.h
+            core.c core.h utils.c utils.h
             breakpoint_sw.h cconv.c cconv.h event.c event.h inject.c inject.h
             log.c log.h mmap.c mmap.h module.c module.h process.c process.h
             ptrace.c ptrace.h thread.c thread.h)

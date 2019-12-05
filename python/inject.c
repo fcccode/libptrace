@@ -92,7 +92,7 @@ int __pypt_inject_handler_pre(struct pt_process *process, void *cookie)
 	}
 
 	/* Convert the python return value into an integer. */
-	ret = PyInt_AsLong(pyret);
+	ret = py_num_to_long(pyret);
 	Py_DECREF(pyret);
 	if (ret == -1 && PyErr_Occurred()) {
 		/* XXX: raise an error. */
@@ -145,7 +145,7 @@ int __pypt_inject_handler_post(struct pt_process *process, void *cookie)
 	}
 
 	/* Convert the python return value into an integer. */
-	ret = PyInt_AsLong(pyret);
+	ret = py_num_to_long(pyret);
 	Py_DECREF(pyret);
 	if (ret == -1 && PyErr_Occurred()) {
 		/* XXX: raise an error. */

@@ -56,18 +56,9 @@
 #define MODULE_INIT_FUNC_NAME(name) _MODULE_INIT_FUNC_NAME(name)
 
 #if PY_MAJOR_VERSION >= 3
-  #define PyInt_AsLong        PyLong_AsLong
-  #define PyInt_Check(x)      0
   #define PyInt_FromLong      PyLong_FromLong
   #define PyInt_FromSize_t    PyLong_FromSize_t
   #define PyInt_FromSsize_t   PyLong_FromSsize_t
-  #if PY_MINOR_VERSION >= 3
-    #define PyString_AsString PyUnicode_AsUTF8 
-  #else
-    #define PyString_AsString PyUnicode_AsString
-  #endif
-  #define PyString_Check      PyUnicode_Check
-  #define PyString_Decode     PyUnicode_Decode
   #define PyString_FromFormat PyUnicode_FromFormat
   #define PyString_FromString PyUnicode_FromString
 #else
@@ -75,4 +66,18 @@
   #define PyBytes_AsStringAndSize   PyString_AsStringAndSize
 #endif
 
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+int                py_num_check(PyObject *o);
+int                py_string_check(PyObject *o);
+long               py_num_to_long(PyObject *o);
+unsigned long long py_num_to_ulonglong(PyObject *o);
+char *             py_string_to_utf8(PyObject *o);
+
+#ifdef __cplusplus
+};
+#endif
+
+#endif	/* !__PYTHON_PTRACE_COMPAT_H */

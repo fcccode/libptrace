@@ -40,6 +40,7 @@
 #
 # Author: Ronald Huizer <ronald@immunityinc.com>
 #
+from __future__ import print_function
 import sys
 import time
 import _ptrace
@@ -47,18 +48,18 @@ import argparse
 import threading
 
 def logger(cookie, string):
-    print string,
+    print(string, end='')
 
 def attached(process):
-    print "attached"
+    print("attached")
 
 def remote_brk(handle):
     time.sleep(1)
-    print "remote breaking process..."
+    print("remote breaking process...")
     _ptrace.process_break_remote(handle)
 
 def remote_brk_handler(process, thread, chance):
-    print "remote break event received"
+    print("remote break event received")
     _ptrace.process_detach(process)
 
 parser = argparse.ArgumentParser(description='Remote break demonstration script.')

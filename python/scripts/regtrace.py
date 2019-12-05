@@ -38,6 +38,7 @@
 #
 # Author: Ronald Huizer <ronald@immunityinc.com>
 #
+from __future__ import print_function
 import sys
 import signal
 import _ptrace
@@ -57,7 +58,7 @@ def break_handler(signum, frame):
     _ptrace.quit();
 
 def logger(cookie, string):
-    print string,
+    print(string, end='')
 
 def attached_handler(process):
     bpRegOpenKeyEx  = _ptrace.breakpoint_sw("advapi32!RegOpenKeyExW", regOpenKeyEx)
@@ -68,7 +69,7 @@ def attached_handler(process):
     process.breakpoint_set(bpRegQueryValueEx)
 
 def bp_end_handler(breakpoint, thread):
-    print "= %d" % _ptrace.cconv.retval_get(thread)
+    print("= {}".format(_ptrace.cconv.retval_get(thread)))
 
 def regOpenKeyEx(breakpoint, thread):
     retaddr = _ptrace.cconv.retaddr_get(thread)
@@ -81,8 +82,8 @@ def regOpenKeyEx(breakpoint, thread):
 
     subkey = thread.process.read_utf16(subkey)
 
-    print "T%d: RegOpenKeyEx(%s, \"%s\", 0x%08x, 0x%08x, 0x%08x)" % \
-        (thread.id, key, subkey, options, sam, result),
+    print('T{}: RegOpenKeyEx({}, "{}", 0x{:08x}, 0x{:08x}, 0x{:08x})'
+          .format(thread.id, key, subkey, options, sam, result))
 
     # Set breakpoint after function returns, so we can print the results.
     if thread.process.breakpoint_find(retaddr) is None:
@@ -101,8 +102,7 @@ def regGetValue(breakpoint, thread):
     subkey = thread.process.read_utf16(subkey)
     value  = thread.process.read_utf16(value)
 
-    print "T%d: RegGetValue(%s, \"%s\", \"%s\")" % \
-        (thread.id, key, subkey, value)
+    print('T{}: RegGetValue({}, "{}", "{}")'.format(thread.id, key, subkey, value))
 
     # Set breakpoint after function returns, so we can print the results.
     if thread.process.breakpoint_find(retaddr) is None:
@@ -120,8 +120,8 @@ def regQueryValueEx(breakpoint, thread):
 
     value = thread.process.read_utf16(value)
 
-    print "T%d: RegQueryValueEx(%s, \"%s\", 0x%.8x, 0x%.8x 0x%.8x 0x%.8x)" % \
-        (thread.id, key, value, reserved, type, data, size),
+    print('T{}: RegQueryValueEx({}, "{}", 0x{:08x}, 0x{:08x}, 0x{:08x}, 0x{:08x})'
+          .format(thread.id, key, value, reserved, type, data, size))
 
     # Set breakpoint after function returns, so we can print the results.
     if thread.process.breakpoint_find(retaddr) is None:

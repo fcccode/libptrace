@@ -280,7 +280,7 @@ err:
 		if ( (integer = PyDict_GetItemString(m, n)) == NULL)	\
 			return NULL;					\
 									\
-		value = PyInt_AsLong(integer);				\
+		value = py_num_to_long(integer);			\
 		if (value == -1 && PyErr_Occurred())			\
 			return NULL;					\
 	} while (0)

@@ -135,8 +135,8 @@ import _ptrace
 def bp_handler(bp, thread):
     (key, subkey, options, sam, result) = _ptrace.cconv.args_get(thread, "%u%p%u%u%p")
     subkey = thread.process.read_utf16(subkey)
-    print "T%d: RegOpenKeyEx(%s, \"%s\", 0x%08x, 0x%08x, 0x%08x)" % \
-        (thread.id, key, subkey, options, sam, result),
+    print('T{}: RegOpenKeyEx({}, "{}", 0x{:08x}, 0x{:08x}, 0x{:08x})'
+          .format(thread.id, key, subkey, options, sam, result), end='')
 
 def attached_handler(process):
     bp = _ptrace.breakpoint_sw("advapi32!RegOpenKeyExW", bp_handler)
@@ -154,13 +154,13 @@ a breakpoint on the return address of the function call.  This avoids the
 need for code analysis to determine function exit paths statically:
 ```
 def bp_end_handler(bp, thread):
-    print "= %d" % _ptrace.cconv.retval_get(thread)
+    print("=", _ptrace.cconv.retval_get(thread))
 
 def bp_handler(bp, thread):
     (key, subkey, options, sam, result) = _ptrace.cconv.args_get(thread, "%u%p%u%u%p")
     subkey = thread.process.read_utf16(subkey)
-    print "T%d: RegOpenKeyEx(%s, \"%s\", 0x%08x, 0x%08x, 0x%08x)" % \
-        (thread.id, key, subkey, options, sam, result),
+    print('T{}: RegOpenKeyEx({}, "{}", 0x{:08x}, 0x{:08x}, 0x{:08x})'
+          .format(thread.id, key, subkey, options, sam, result), end='')
 
     retaddr = _ptrace.cconv.retaddr_get(thread)
     if thread.process.breakpoint_find(retaddr) is None:

@@ -86,7 +86,7 @@ static void __pypt_log_hook_handler(void *cookie, const char *fmt, va_list va)
 	/* XXX: change 'replace' to 'strict' once we support handler
          * exceptions properly.
 	 */
-	pystr = PyString_Decode(str, ret, "utf-8", "replace");
+	pystr = PyUnicode_Decode(str, ret, "utf-8", "replace");
 	if (pystr == NULL)
 		goto end_free;
 
